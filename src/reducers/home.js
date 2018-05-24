@@ -7,7 +7,8 @@ import {
 const initialState= {
     home: [],
     isFetching: false,
-    error : false
+    error : false,
+    filterChoices: []
 }
 
 export default function homeReducer (state= initialState, action) {
@@ -29,6 +30,13 @@ export default function homeReducer (state= initialState, action) {
                 isFetching: false,
                 error: true
             }
+        
+        case 'FILTER_LINERS_DATA': 
+            return {
+                ...state,
+                filterChoices: action.data
+            }
+        
         default: return state
     }
 }

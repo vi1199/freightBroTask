@@ -10,7 +10,7 @@ import {
     ScrollView
 } from 'react-native';
 import { bindActionCreators } from 'redux';
-import { homeActions } from '../actions/homeActions';
+import * as allActions from '../actions/homeActions';
 import { connect } from 'react-redux';
 
 
@@ -27,7 +27,14 @@ class FreightBroHome extends Component {
     componentWillReceiveProps (nextProps) {
         this.setState({result: nextProps.home.home})
     }
+    handleSearchAndFilter = () => {
+        this.props.navigation.navigate('Search', {screenProps: this.props})
+    }
     render (){
+        const { navigation }= this.props;
+        const sortFilter= navigation.getParam('lowestValue', '')
+
+        console.log('sort is--------->>>>>>', sortFilter)
         // bug in react-navigation . to ignore i added this. :)
         YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
         const { home, isFetching } = this.props.home
@@ -42,13 +49,185 @@ class FreightBroHome extends Component {
                 <View style= {styles.container}>
                 <View style = {{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 10, paddingVertical: 20,}}>
                 <Text style= {styles.ocean_freigth}>Quotes</Text>
-                <Text style= {styles.ocean_freigth}>Modify Search</Text>
+                <Text style= {styles.ocean_freigth} onPress= {this.handleSearchAndFilter}>Modify Search</Text>
             </View>
                 <ScrollView>
                 {
-                      
-                    this.state.result.map((item, idx)=>{
-                    
+
+                    this.props.home.filterChoices.length > 0 ? 
+                        this.state.result.filter( item => this.props.home.filterChoices.includes(item.sub_vendor.sub_vendor_name) ).map (
+                            (item, idx) => {
+                                originCharge= item.charges[1] ? item.charges[1].charge_cost: 0
+                                destCharges= item.charges[2]? item.charges[2].charge_cost: 0
+                                currencyOrigin= item.charges[1] ? item.charges[1].charge_currency: ''
+                                currencyDest= item.charges[2] ? item.charges[2].charge_currency: ''
+                                 // Rate card based on MainFreight. here MainFreight = 'l3_fcl'
+                                 if (item.leg_code === 'l3_fcl' ) {
+                                 return (
+                                     <View style= {styles.view_container} key= {idx}>
+                                         <Text style= {styles.vendor_name}>{item.sub_vendor.sub_vendor_name}</Text>
+                                         <Text style= {styles.expiry}>Expires On: {item.expiry}</Text>
+                                         <View style= {styles.row_container}>
+                                             <Text style= {styles.ocean_freigth}>Ocean Freight</Text>
+                                             <Text style= {styles.ocean_freigth}>{item.charges[0].charge_currency} {item.charges[0].charge_cost}</Text>
+                                         </View>
+                                         <View style= {styles.row_container}>
+                                             <Text style= {styles.ocean_freigth}>Origin Charges</Text>
+                                             <Text style= {styles.ocean_freigth}>{currencyOrigin} {originCharge}</Text>
+                                         </View>
+                                         <View style= {styles.row_container}>
+                                             <Text style= {styles.ocean_freigth}>Destination Charges</Text>
+                                             <Text style= {styles.ocean_freigth}>{currencyDest} {destCharges}</Text>
+                                         </View>
+                                         <View style= {styles.seperator}></View>
+                                         <View style= {styles.row_container}>
+                                             <Text style= {styles.ocean_freigth}>{item.schedule[0].transit_time}</Text>
+                                             <Text style= {styles.ocean_freigth}>{item.schedule[0].via_port}</Text>
+                                         </View>
+                                         <View style= {styles.row_container}>
+                                             <Text style= {styles.ocean_freigth}>{item.expiry}</Text>
+                                             <Text style= {[styles.ocean_freigth, {color: '#FCB530', fontWeight: '500' }]}>MORE</Text>
+                                         </View>
+                                         <View style= {styles.seperator}></View>
+                                         <View style= {styles.row_container}>
+                                             <Text style= {[styles.ocean_freigth, {fontWeight: '500'}]}>Total COST</Text>
+                                             <Text style= {styles.ocean_freigth}>{item.leg_currency} {item.leg_currency_cost}</Text>
+                                         </View>
+         
+                                         <View style= {styles.row_container}>
+                                             <TouchableOpacity style= {styles.touch_button}>
+                                             <View style= {[styles.buttons_container, {backgroundColor: '#C3C3C3'}]}>
+                                                 <Text style= {styles.button_text}>DETAILS</Text>
+                                             </View>
+                                             </TouchableOpacity>
+                                             <TouchableOpacity style= {styles.touch_button}>
+                                             <View style= {[styles.buttons_container, {backgroundColor: '#FCB530'}]}>
+                                                 <Text style= {styles.button_text}>BOOK NOW</Text>
+                                             </View>
+                                             </TouchableOpacity>
+                                         </View>
+                                 </View>
+                                 ) 
+                             }
+                             
+                            }
+                        ) :
+                        sortFilter !== '' ? (
+                            sortFilter === 'Lowest Price' ? (
+                                this.state.result.sort(function(a,b) {return parseInt(a.leg_currency_cost, 10) - parseInt(b.leg_currency_cost, 10)}).map((item, idx)=>{   
+                                    originCharge= item.charges[1] ? item.charges[1].charge_cost: 0
+                                    destCharges= item.charges[2]? item.charges[2].charge_cost: 0
+                                    currencyOrigin= item.charges[1] ? item.charges[1].charge_currency: ''
+                                    currencyDest= item.charges[2] ? item.charges[2].charge_currency: ''
+                                     // Rate card based on MainFreight. here MainFreight = 'l3_fcl'
+                                     if (item.leg_code === 'l3_fcl' ) {
+                                     return (
+                                         <View style= {styles.view_container} key= {idx}>
+                                             <Text style= {styles.vendor_name}>{item.sub_vendor.sub_vendor_name}</Text>
+                                             <Text style= {styles.expiry}>Expires On: {item.expiry}</Text>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {styles.ocean_freigth}>Ocean Freight</Text>
+                                                 <Text style= {styles.ocean_freigth}>{item.charges[0].charge_currency} {item.charges[0].charge_cost}</Text>
+                                             </View>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {styles.ocean_freigth}>Origin Charges</Text>
+                                                 <Text style= {styles.ocean_freigth}>{currencyOrigin} {originCharge}</Text>
+                                             </View>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {styles.ocean_freigth}>Destination Charges</Text>
+                                                 <Text style= {styles.ocean_freigth}>{currencyDest} {destCharges}</Text>
+                                             </View>
+                                             <View style= {styles.seperator}></View>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {styles.ocean_freigth}>{item.schedule[0].transit_time}</Text>
+                                                 <Text style= {styles.ocean_freigth}>{item.schedule[0].via_port}</Text>
+                                             </View>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {styles.ocean_freigth}>{item.expiry}</Text>
+                                                 <Text style= {[styles.ocean_freigth, {color: '#FCB530', fontWeight: '500' }]}>MORE</Text>
+                                             </View>
+                                             <View style= {styles.seperator}></View>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {[styles.ocean_freigth, {fontWeight: '500'}]}>Total COST</Text>
+                                                 <Text style= {styles.ocean_freigth}>{item.leg_currency} {item.leg_currency_cost}</Text>
+                                             </View>
+             
+                                             <View style= {styles.row_container}>
+                                                 <TouchableOpacity style= {styles.touch_button}>
+                                                 <View style= {[styles.buttons_container, {backgroundColor: '#C3C3C3'}]}>
+                                                     <Text style= {styles.button_text}>DETAILS</Text>
+                                                 </View>
+                                                 </TouchableOpacity>
+                                                 <TouchableOpacity style= {styles.touch_button}>
+                                                 <View style= {[styles.buttons_container, {backgroundColor: '#FCB530'}]}>
+                                                     <Text style= {styles.button_text}>BOOK NOW</Text>
+                                                 </View>
+                                                 </TouchableOpacity>
+                                             </View>
+                                     </View>
+                                     ) 
+                                 }
+                                 })
+                            ) 
+                             : sortFilter === 'Highest Price' && (
+                                this.state.result.sort(function(a,b) {return parseInt(b.leg_currency_cost, 10) - parseInt(a.leg_currency_cost, 10)}).map((item, idx)=>{   
+                                    originCharge= item.charges[1] ? item.charges[1].charge_cost: 0
+                                    destCharges= item.charges[2]? item.charges[2].charge_cost: 0
+                                    currencyOrigin= item.charges[1] ? item.charges[1].charge_currency: ''
+                                    currencyDest= item.charges[2] ? item.charges[2].charge_currency: ''
+                                     // Rate card based on MainFreight. here MainFreight = 'l3_fcl'
+                                     if (item.leg_code === 'l3_fcl' ) {
+                                     return (
+                                         <View style= {styles.view_container} key= {idx}>
+                                             <Text style= {styles.vendor_name}>{item.sub_vendor.sub_vendor_name}</Text>
+                                             <Text style= {styles.expiry}>Expires On: {item.expiry}</Text>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {styles.ocean_freigth}>Ocean Freight</Text>
+                                                 <Text style= {styles.ocean_freigth}>{item.charges[0].charge_currency} {item.charges[0].charge_cost}</Text>
+                                             </View>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {styles.ocean_freigth}>Origin Charges</Text>
+                                                 <Text style= {styles.ocean_freigth}>{currencyOrigin} {originCharge}</Text>
+                                             </View>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {styles.ocean_freigth}>Destination Charges</Text>
+                                                 <Text style= {styles.ocean_freigth}>{currencyDest} {destCharges}</Text>
+                                             </View>
+                                             <View style= {styles.seperator}></View>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {styles.ocean_freigth}>{item.schedule[0].transit_time}</Text>
+                                                 <Text style= {styles.ocean_freigth}>{item.schedule[0].via_port}</Text>
+                                             </View>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {styles.ocean_freigth}>{item.expiry}</Text>
+                                                 <Text style= {[styles.ocean_freigth, {color: '#FCB530', fontWeight: '500' }]}>MORE</Text>
+                                             </View>
+                                             <View style= {styles.seperator}></View>
+                                             <View style= {styles.row_container}>
+                                                 <Text style= {[styles.ocean_freigth, {fontWeight: '500'}]}>Total COST</Text>
+                                                 <Text style= {styles.ocean_freigth}>{item.leg_currency} {item.leg_currency_cost}</Text>
+                                             </View>
+             
+                                             <View style= {styles.row_container}>
+                                                 <TouchableOpacity style= {styles.touch_button}>
+                                                 <View style= {[styles.buttons_container, {backgroundColor: '#C3C3C3'}]}>
+                                                     <Text style= {styles.button_text}>DETAILS</Text>
+                                                 </View>
+                                                 </TouchableOpacity>
+                                                 <TouchableOpacity style= {styles.touch_button}>
+                                                 <View style= {[styles.buttons_container, {backgroundColor: '#FCB530'}]}>
+                                                     <Text style= {styles.button_text}>BOOK NOW</Text>
+                                                 </View>
+                                                 </TouchableOpacity>
+                                             </View>
+                                     </View>
+                                     ) 
+                                 }
+                                 })
+                             )
+                             
+                        ) : 
+                    this.state.result.map((item, idx)=>{   
                        originCharge= item.charges[1] ? item.charges[1].charge_cost: 0
                        destCharges= item.charges[2]? item.charges[2].charge_cost: 0
                        currencyOrigin= item.charges[1] ? item.charges[1].charge_currency: ''
@@ -186,7 +365,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        ...bindActionCreators({ homeActions }, dispatch)
+        ...bindActionCreators( allActions, dispatch)
     }
 }
 

@@ -13,6 +13,7 @@ export function homeActions () {
             return (dispatch(getApiSuccessData(json.result_data.rates)))
         })
         .catch(err => {
+            console.log('error is', err)
             dispatch(getApiFailureData(err))
         })
     }
@@ -35,4 +36,11 @@ function getApiFailureData () {
     return {
         type: FETCH_RATES_FAILURE
     }
+}
+
+export function filterLinersData (data) {
+    return {
+        type: 'FILTER_LINERS_DATA',
+        data
+    } 
 }
