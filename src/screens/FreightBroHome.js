@@ -33,9 +33,7 @@ class FreightBroHome extends Component {
     render (){
         const { navigation }= this.props;
         const sortFilter= navigation.getParam('lowestValue', '')
-
-        console.log('sort is--------->>>>>>', sortFilter)
-        // bug in react-navigation . to ignore i added this. :)
+        // bug in react-navigation .
         YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
         const { home, isFetching } = this.props.home
         if (isFetching) {

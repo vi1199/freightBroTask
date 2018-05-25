@@ -6,7 +6,7 @@ import {
     Button,
     CheckBox
 } from 'react-native';
-
+//ANL
 //CMA CGM
 //MAERSK
 //SAFMARINE
@@ -41,11 +41,6 @@ class FilterPage extends Component {
             this.state= {
                 linersFilter : checkBoxValues.slice(),
                 linersFilterArray: [].slice(),
-                ansl: '',
-                cma: '',
-                maersk: '',
-                safmarine: '',
-                yang:'',
             checkboxChecked: false,        
             }
             this.filterOptions = { linersFilterArray: [] }
@@ -73,48 +68,22 @@ class FilterPage extends Component {
             </View>
           )
         }
-
     handleButtonPress = () => {
-        console.log('filters ====>>>>', this.state.linersFilterArray);
         this.props.navigation.state.params.screenProps.filterLinersData(this.state.linersFilterArray)
         this.props.navigation.navigate('Home')
-        // console.log('props', this.props.navigation.state.params.screenProps);
-
     }
-    // handleAnlcCheckBox = (value, id) => {
-    //     console.log('value is', id)
-    // }
-    // handleCmaCheckBox = (value, id) => {
-    //     console.log('value is', value, id)
-    // }
-    // handleMaerslCheckBox = (value, id) => {
-    //     console.log('value is', value, id)
-    // }
-    // handleSafmarineCheckBox = (value, id) => {
-    //     console.log('value is', value, id)
-    // }
-    // handleYandCheckBox = (value, id) => {
-    //     console.log('value is', value, id)
-    // }
     handleCheckbox(value) {
-        console.log('value and id is', value)
         let {linersFilter} = this.state;
         let {linersFilterArray} = this.state;
-
         let activeObject = linersFilter.find( item => item.label === value )
             activeObject.checked = !activeObject.checked;
-        
         this.setState( {linersFilter} )
-        
         if(linersFilterArray.includes(value)) {
             linersFilterArray.splice( linersFilterArray.findIndex(item => item === value), 1 );            
         } else {
             linersFilterArray.push(value);
         }
-
         this.setState( {linersFilterArray} )
-        
-        console.log('state object', linersFilter, 'filter object', linersFilterArray)
     }
     render() {
         console.log('state|||', this.state.linersFilter, 'filterOptions|||', this.state.linersFilterArray)
@@ -124,7 +93,7 @@ class FilterPage extends Component {
                 {
                     this.state.linersFilter.map( (item, idx) => {
                         return (
-                            <View key={idx} style= {{flexDirection: 'row', alignItems: 'center', padding: 10,}}>
+                            <View key={idx} style= {{flexDirection: 'row', alignItems: 'center', padding: 5,}}>
                                 <CheckBox
                                     value= {item.checked}
                                     onValueChange= {() => this.handleCheckbox(item.label)}/>
@@ -133,12 +102,11 @@ class FilterPage extends Component {
                         )
                     } )
                 }
-
-                
-                
+                <View style= {styles.container}>
                 <Button 
                     title= 'Apply'
                     onPress= {() => this.handleButtonPress()}/>
+                    </View>
             </View>
         )
     }
@@ -154,7 +122,12 @@ const styles= StyleSheet.create({
     row_container: {
         flexDirection: 'row',
         justifyContent: 'space-between'
-    }
+    },
+    container: {
+        alignItems: 'flex-start',
+        padding: 20,
+        backgroundColor: 'transparent'
+      },
 })
 
 export default FilterPage;

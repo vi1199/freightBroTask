@@ -28,6 +28,11 @@ const BottomTabs= createBottomTabNavigator (
                 alignItems: 'center',
             },
         },
+    },
+    {
+        navigationOptions: {
+            title: 'Sort'
+        }
     }
 )
 export const Root = createStackNavigator({

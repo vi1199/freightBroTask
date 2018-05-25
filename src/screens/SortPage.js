@@ -20,6 +20,9 @@ class SortPage extends Component {
             selectedValue: ''
         }
     }
+    static navigationOptions= {
+        title: 'Sort'
+    }
     handleButtonPress = () =>{
         this.props.navigation.navigate('Home', {lowestValue: this.state.selectedOption})
     }
@@ -50,10 +53,12 @@ class SortPage extends Component {
                   )
                 })
               }
-
+              <View style= {styles.container}>
               <Button 
               title= 'Apply'
-              onPress= {() => this.handleButtonPress()}/>
+              onPress= {() => this.handleButtonPress()}
+              style= {{alignSelf: 'center', }}/>
+              </View>
             </View>
         )
     }
@@ -78,7 +83,12 @@ const styles= StyleSheet.create({
     row_container: {
         flexDirection: 'row',
         justifyContent: 'space-between'
-    }
+    },
+    container: {
+        alignItems: 'flex-start',
+        padding: 30,
+        backgroundColor: 'transparent'
+      },
 })
 
 export default SortPage;
